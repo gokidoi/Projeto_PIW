@@ -1,9 +1,6 @@
-# 💊 Sistema de Inventário de Suplementos
+# 🏆 Excelência Fitness - Marketplace de Suplementos
 
-Um sistema web completo para gerenciamento de inventário de suplementos para academias, desenvolvido com React.js e Firebase.
-
-## 🌐 Demo Online
-**🔗 Acesse o sistema:** https://inventario-8b388.web.app
+Sistema web completo de inventário e marketplace de suplementos para academias, desenvolvido com React.js e Firebase. Permite gerenciar estoque privado e publicar produtos em marketplace compartilhado.
 
 ## ✨ Funcionalidades
 

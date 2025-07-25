@@ -1,38 +1,206 @@
-.App {
-  text-align: center;
+/* Reset global e normalização */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* Estilos globais para responsividade */
+.App {
+  text-align: center;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Responsividade geral */
+.responsive-container {
+  max-width: 100%;
+  padding: 0 16px;
+}
+
+@media (max-width: 600px) {
+  .responsive-container {
+    padding: 0 8px;
+  }
+}
+
+/* Melhorias para elementos do Material-UI */
+.MuiContainer-root {
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+@media (max-width: 600px) {
+  .MuiContainer-root {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  
+  /* Ajustar títulos em telas pequenas */
+  .MuiTypography-h4 {
+    font-size: 1.5rem !important;
+  }
+  
+  .MuiTypography-h5 {
+    font-size: 1.25rem !important;
+  }
+  
+  /* Ajustar botões em mobile */
+  .MuiButton-root {
+    min-width: auto !important;
+    padding: 8px 12px !important;
+  }
+  
+  /* Melhorar cards em mobile */
+  .MuiCard-root {
+    margin-bottom: 16px !important;
+  }
+  
+  /* DataGrid responsivo */
+  .MuiDataGrid-root {
+    font-size: 0.75rem !important;
+  }
+  
+  .MuiDataGrid-columnHeaders {
+    font-size: 0.7rem !important;
+  }
+}
+
+/* Melhorias para tablets */
+@media (min-width: 601px) and (max-width: 960px) {
+  .MuiContainer-root {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+}
+
+/* Scroll horizontal para tabelas em mobile */
+@media (max-width: 960px) {
+  .MuiDataGrid-root {
+    overflow-x: auto !important;
+  }
+}
+
+/* Header responsivo */
+@media (max-width: 600px) {
+  .MuiToolbar-root {
+    min-height: 56px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  
+  .MuiAppBar-root .MuiTypography-h6 {
+    font-size: 1rem !important;
+  }
+}
+
+/* Login page responsiva */
+@media (max-width: 600px) {
+  .login-container {
+    padding: 16px !important;
+  }
+  
+  .login-paper {
+    padding: 24px 16px !important;
+  }
+}
+
+/* Landing page centralizada */
+.landing-page-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Animações suaves */
+.MuiButton-root,
+.MuiCard-root,
+.MuiPaper-root {
+  transition: all 0.2s ease-in-out !important;
+}
+
+.MuiButton-root:hover {
+  transform: translateY(-1px) !important;
+}
+
+/* Cores personalizadas para Excelência Fitness */
+:root {
+  --primary-color: #1976d2;
+  --secondary-color: #dc004e;
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --error-color: #f44336;
+  --background-color: #f5f5f5;
+}
+
+/* Override do Material-UI para tema personalizado */
+.MuiAppBar-colorPrimary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #1565c0 100%) !important;
+}
+
+/* Indicadores de loading */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  z-index: 9999;
 }
 
-.App-link {
-  color: #61dafb;
+/* Melhorias de acessibilidade */
+.MuiButton-root:focus,
+.MuiIconButton-root:focus {
+  outline: 2px solid var(--primary-color) !important;
+  outline-offset: 2px !important;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+/* Remove outline padrão do browser */
+.MuiButton-root:focus:not(:focus-visible),
+.MuiIconButton-root:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
+/* Print styles */
+@media print {
+  .MuiAppBar-root,
+  .MuiButton-root,
+  .no-print {
+    display: none !important;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .MuiContainer-root {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+}
+
+/* Melhorias para telas de alta resolução */
+@media (min-width: 1920px) {
+  .MuiContainer-maxWidthLg {
+    max-width: 1400px !important;
   }
 }

@@ -22,7 +22,9 @@ import {
   Category as CategoryIcon,
   Schedule as ScheduleIcon,
   AttachMoney as MoneyIcon,
-  ShowChart as ProfitIcon
+  ShowChart as ProfitIcon,
+  Store as StoreIcon,
+  VisibilityOff as PrivateIcon
 } from '@mui/icons-material';
 import { useInventory } from '../contexts/InventoryContext';
 
@@ -46,6 +48,10 @@ const Dashboard = () => {
   const totalProfit = getTotalProfit();
   const profitMargin = getProfitMargin();
   const categories = getSupplementsByCategory();
+  
+  // Novos cálculos para produtos publicados
+  const publishedItems = supplements.filter(s => s.publicado === true);
+  const unpublishedItems = supplements.filter(s => !s.publicado);
 
   const StatCard = ({ title, value, icon, color = 'primary', subtitle }) => (
     <Card sx={{ height: '100%' }}>
@@ -82,9 +88,26 @@ const Dashboard = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Dashboard - Inventário de Suplementos
-      </Typography>
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: { xs: 'column', sm: 'row' },
+        justifyContent: 'space-between', 
+        alignItems: { xs: 'flex-start', sm: 'center' },
+        mb: 4,
+        gap: { xs: 2, sm: 0 }
+      }}>
+        <Typography 
+          variant="h4" 
+          gutterBottom
+          sx={{
+            fontWeight: 600,
+            color: 'primary.main',
+            fontSize: { xs: '1.75rem', sm: '2.125rem' }
+          }}
+        >
+          Dashboard - Excelência Fitness
+        </Typography>
+      </Box>
 
       {/* Cards de Estatísticas */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -148,6 +171,26 @@ const Dashboard = () => {
             icon={<ScheduleIcon sx={{ fontSize: 40 }} />}
             color="error"
             subtitle="Itens próximos do vencimento"
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Publicados na Loja"
+            value={publishedItems.length}
+            icon={<StoreIcon sx={{ fontSize: 40 }} />}
+            color="info"
+            subtitle="Visíveis para clientes"
+          />
+        </Grid>
+        
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Apenas no Estoque"
+            value={unpublishedItems.length}
+            icon={<PrivateIcon sx={{ fontSize: 40 }} />}
+            color="secondary"
+            subtitle="Não visíveis na loja"
           />
         </Grid>
 

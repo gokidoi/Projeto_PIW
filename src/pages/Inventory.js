@@ -236,8 +236,23 @@ const Inventory = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Typography variant="h4" gutterBottom>
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: { xs: 'column', sm: 'row' },
+        justifyContent: 'space-between', 
+        alignItems: { xs: 'flex-start', sm: 'center' },
+        mb: 4,
+        gap: { xs: 2, sm: 0 }
+      }}>
+        <Typography 
+          variant="h4" 
+          gutterBottom
+          sx={{
+            fontWeight: 600,
+            color: 'primary.main',
+            fontSize: { xs: '1.75rem', sm: '2.125rem' }
+          }}
+        >
           Inventário de Suplementos
         </Typography>
         <Button
@@ -245,6 +260,11 @@ const Inventory = () => {
           startIcon={<AddIcon />}
           onClick={handleAddNew}
           size="large"
+          sx={{
+            minWidth: { xs: '100%', sm: 'auto' },
+            height: 48,
+            fontWeight: 600,
+          }}
         >
           Adicionar Suplemento
         </Button>

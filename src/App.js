@@ -5,12 +5,17 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { InventoryProvider } from './contexts/InventoryContext';
+import { StoreProvider } from './contexts/StoreContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import Header from './components/Header';
+import AdminHeader from './components/admin/AdminHeader';
+import StoreHeader from './components/store/StoreHeader';
+import ShoppingCart from './components/store/ShoppingCart';
 import Login from './components/Login';
 import Dashboard from './pages/Dashboard';
 import Inventory from './pages/Inventory';
 import Reports from './pages/Reports';
+import StorePage from './pages/store/StorePage';
+import LandingPage from './pages/LandingPage';
 import './App.css';
 
 // Tema personalizado do Material-UI
@@ -34,14 +39,27 @@ const theme = createTheme({
   },
 });
 
-// Componente de Layout
-const Layout = ({ children }) => {
+// Componente de Layout Admin
+const AdminLayout = ({ children }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Header />
+      <AdminHeader />
       <Box component="main" sx={{ flexGrow: 1, backgroundColor: '#f5f5f5', paddingBottom: 4 }}>
         {children}
       </Box>
+    </Box>
+  );
+};
+
+// Componente de Layout da Loja
+const StoreLayout = ({ children }) => {
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <StoreHeader />
+      <Box component="main" sx={{ flexGrow: 1, backgroundColor: '#fafafa', paddingBottom: 4 }}>
+        {children}
+      </Box>
+      <ShoppingCart />
     </Box>
   );
 };
@@ -52,42 +70,55 @@ const AppRoutes = () => {
 
   return (
     <Routes>
+      {/* Rota de Login */}
       <Route 
         path="/login" 
-        element={user ? <Navigate to="/dashboard" replace /> : <Login />} 
+        element={user ? <Navigate to="/" replace /> : <Login />} 
       />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Dashboard />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/inventory"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Inventory />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/reports"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Reports />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      
+      {/* Landing Page */}
+      <Route path="/" element={<LandingPage />} />
+      
+      {/* Rotas da Loja (Públicas - podem ser acessadas sem login) */}
+      <Route path="/store" element={
+        <StoreProvider>
+          <StoreLayout>
+            <StorePage />
+          </StoreLayout>
+        </StoreProvider>
+      } />
+      
+      {/* Rotas Administrativas (Protegidas) */}
+      <Route path="/admin/*" element={
+        <ProtectedRoute>
+          <InventoryProvider>
+            <Routes>
+              <Route path="dashboard" element={
+                <AdminLayout>
+                  <Dashboard />
+                </AdminLayout>
+              } />
+              <Route path="inventory" element={
+                <AdminLayout>
+                  <Inventory />
+                </AdminLayout>
+              } />
+              <Route path="reports" element={
+                <AdminLayout>
+                  <Reports />
+                </AdminLayout>
+              } />
+              <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+            </Routes>
+          </InventoryProvider>
+        </ProtectedRoute>
+      } />
+      
+      {/* Redirecionamentos */}
+      <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
+      <Route path="/inventory" element={<Navigate to="/admin/inventory" replace />} />
+      <Route path="/reports" element={<Navigate to="/admin/reports" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
@@ -96,13 +127,22 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AuthProvider>
-        <InventoryProvider>
+      <Box 
+        sx={{ 
+          width: '100%',
+          minHeight: '100vh',
+          margin: 0,
+          padding: 0,
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        <AuthProvider>
           <Router>
             <AppRoutes />
           </Router>
-        </InventoryProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </Box>
     </ThemeProvider>
   );
 }

@@ -48,15 +48,49 @@ const Header = () => {
   return (
     <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
       <Toolbar>
-        <DashboardIcon sx={{ mr: 2 }} />
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Inventário de Suplementos
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+          <Box
+            sx={{
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              bgcolor: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mr: 1,
+            }}
+          >
+            <Typography variant="h6" color="primary.main" fontWeight="bold">
+              E
+            </Typography>
+          </Box>
+          <Typography 
+            variant="h6" 
+            component="div" 
+            sx={{ 
+              fontWeight: 600,
+              display: { xs: 'none', sm: 'block' }
+            }}
+          >
+            Excelência Fitness
+          </Typography>
+        </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: { xs: 1, sm: 2 },
+          flexGrow: 1,
+          justifyContent: { xs: 'center', sm: 'flex-start' }
+        }}>
           <Button
             color="inherit"
             onClick={() => navigate('/dashboard')}
+            sx={{ 
+              fontSize: { xs: '0.8rem', sm: '0.875rem' },
+              px: { xs: 1, sm: 2 }
+            }}
           >
             Dashboard
           </Button>
@@ -64,6 +98,10 @@ const Header = () => {
           <Button
             color="inherit"
             onClick={() => navigate('/inventory')}
+            sx={{ 
+              fontSize: { xs: '0.8rem', sm: '0.875rem' },
+              px: { xs: 1, sm: 2 }
+            }}
           >
             Inventário
           </Button>
@@ -71,10 +109,27 @@ const Header = () => {
           <Button
             color="inherit"
             onClick={() => navigate('/reports')}
+            sx={{ 
+              fontSize: { xs: '0.8rem', sm: '0.875rem' },
+              px: { xs: 1, sm: 2 }
+            }}
           >
             Relatórios
           </Button>
 
+          <Button
+            color="inherit"
+            onClick={() => navigate('/store')}
+            sx={{ 
+              fontSize: { xs: '0.8rem', sm: '0.875rem' },
+              px: { xs: 1, sm: 2 }
+            }}
+          >
+            Loja
+          </Button>
+        </Box>
+
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <IconButton
             size="large"
             aria-label="account of current user"

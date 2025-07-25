@@ -14,7 +14,9 @@ import {
   MenuItem,
   Box,
   Alert,
-  InputAdornment
+  InputAdornment,
+  FormControlLabel,
+  Switch
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { useInventory } from '../contexts/InventoryContext';
@@ -65,7 +67,8 @@ const SupplementForm = ({ open, onClose, supplement = null }) => {
       fornecedor: '',
       descricao: '',
       estoqueMinimo: '',
-      ativo: true
+      ativo: true,
+      publicado: false
     }
   });
 
@@ -84,7 +87,8 @@ const SupplementForm = ({ open, onClose, supplement = null }) => {
         fornecedor: supplement.fornecedor || '',
         descricao: supplement.descricao || '',
         estoqueMinimo: supplement.estoqueMinimo || '',
-        ativo: supplement.ativo !== undefined ? supplement.ativo : true
+        ativo: supplement.ativo !== undefined ? supplement.ativo : true,
+        publicado: supplement.publicado !== undefined ? supplement.publicado : false
       });
     }
   }, [supplement, reset]);
@@ -352,6 +356,47 @@ const SupplementForm = ({ open, onClose, supplement = null }) => {
                     multiline
                     rows={3}
                     placeholder="Informações adicionais sobre o suplemento..."
+                  />
+                )}
+              />
+            </Grid>
+
+            {/* Controles de Status */}
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="ativo"
+                control={control}
+                defaultValue={true}
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={field.value}
+                        onChange={field.onChange}
+                        color="primary"
+                      />
+                    }
+                    label="✅ Produto ativo no estoque"
+                  />
+                )}
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="publicado"
+                control={control}
+                defaultValue={false}
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={field.value}
+                        onChange={field.onChange}
+                        color="secondary"
+                      />
+                    }
+                    label="🌐 Publicar na loja (visível para clientes)"
                   />
                 )}
               />
