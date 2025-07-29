@@ -32,6 +32,7 @@ export const StoreProvider = ({ children }) => {
       setError(null);
       
       const supplementsRef = collection(db, 'supplements');
+      // Query para buscar apenas produtos publicados e ativos
       const q = query(
         supplementsRef,
         where('publicado', '==', true),
@@ -64,6 +65,7 @@ export const StoreProvider = ({ children }) => {
         return (a.nome || '').localeCompare(b.nome || '');
       });
       
+      // Atualizar estado com produtos filtrados
       setProducts(productsList);
     } catch (error) {
       setError('Erro ao carregar produtos: ' + error.message);
@@ -78,7 +80,7 @@ export const StoreProvider = ({ children }) => {
     fetchProducts();
   }, []);
 
-  // Funções do carrinho
+  // Função de adicionar itens ao carrinho
   const addToCart = (product, quantity = 1) => {
     setCart(prevCart => {
       const existingItem = prevCart.find(item => item.id === product.id);
@@ -106,10 +108,16 @@ export const StoreProvider = ({ children }) => {
     });
   };
 
+  // Função de deletar itens do carrinho
   const removeFromCart = (productId) => {
     setCart(prevCart => prevCart.filter(item => item.id !== productId));
   };
 
+const clearCart = () => {
+    setCart([]);
+  };
+
+  // Atualizar quantidade de um item no carrinho
   const updateCartQuantity = (productId, newQuantity) => {
     if (newQuantity <= 0) {
       removeFromCart(productId);
@@ -126,10 +134,6 @@ export const StoreProvider = ({ children }) => {
           : item
       )
     );
-  };
-
-  const clearCart = () => {
-    setCart([]);
   };
 
   // Cálculos do carrinho

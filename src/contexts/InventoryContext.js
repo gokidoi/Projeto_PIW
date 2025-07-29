@@ -38,7 +38,7 @@ export const InventoryProvider = ({ children }) => {
       setError(null);
       
       const supplementsRef = collection(db, 'supplements');
-      // Simplificando a consulta - primeiro filtra por userId, depois ordena no cliente
+      // Query para buscar apenas os suplementos do usuário logado
       const q = query(
         supplementsRef, 
         where('userId', '==', user.uid)
@@ -99,7 +99,7 @@ export const InventoryProvider = ({ children }) => {
       setError('Erro ao adicionar suplemento: ' + error.message);
       console.error('Erro ao adicionar suplemento:', error);
       throw error;
-    } finally {
+    } finally {   
       setLoading(false);
     }
   };
@@ -252,17 +252,18 @@ export const InventoryProvider = ({ children }) => {
     return categories;
   };
 
+  // Funções para métricas de estoque
   const getLowStockSupplements = () => {
     return supplements.filter(supplement => 
       supplement.quantidade <= (supplement.estoqueMinimo || 0)
     );
   };
 
+  // Função para obter suplementos que estão prestes a vencer
   const getExpiringSoon = (days = 30) => {
     const today = new Date();
     const futureDate = new Date();
     futureDate.setDate(today.getDate() + days);
-    
     return supplements.filter(supplement => {
       if (!supplement.dataVencimento) return false;
       const expDate = new Date(supplement.dataVencimento);
