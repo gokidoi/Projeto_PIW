@@ -16,10 +16,12 @@ import {
   Alert,
   InputAdornment,
   FormControlLabel,
-  Switch
+  Switch,
+  Typography
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
-import { useInventory } from '../contexts/InventoryContext';
+import { useInventory } from '../../contexts';
+import { useAuth } from '../../contexts';
 
 const CATEGORIES = [
   'Proteína',
@@ -45,6 +47,7 @@ const UNITS = [
 
 const SupplementForm = ({ open, onClose, supplement = null }) => {
   const { addSupplement, updateSupplement, loading } = useInventory();
+  const { user } = useAuth();
   const [error, setError] = useState('');
   const isEditing = !!supplement;
 
@@ -52,6 +55,7 @@ const SupplementForm = ({ open, onClose, supplement = null }) => {
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -64,11 +68,12 @@ const SupplementForm = ({ open, onClose, supplement = null }) => {
       precoVenda: '',
       dataCompra: '',
       dataVencimento: '',
-      fornecedor: '',
+      fornecedor: user?.email || '',
       descricao: '',
       estoqueMinimo: '',
       ativo: true,
-      publicado: false
+      publicado: false,
+      imagemUrl: ''
     }
   });
 
@@ -88,7 +93,8 @@ const SupplementForm = ({ open, onClose, supplement = null }) => {
         descricao: supplement.descricao || '',
         estoqueMinimo: supplement.estoqueMinimo || '',
         ativo: supplement.ativo !== undefined ? supplement.ativo : true,
-        publicado: supplement.publicado !== undefined ? supplement.publicado : false
+        publicado: supplement.publicado !== undefined ? supplement.publicado : false,
+        imagemUrl: supplement.imagemUrl || ''
       });
     }
   }, [supplement, reset]);
@@ -321,8 +327,10 @@ const SupplementForm = ({ open, onClose, supplement = null }) => {
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="Fornecedor"
+                    label="Fornecedor (Email)"
                     fullWidth
+                    disabled
+                    helperText="Preenchido automaticamente com seu email"
                   />
                 )}
               />
@@ -360,6 +368,56 @@ const SupplementForm = ({ open, onClose, supplement = null }) => {
                 )}
               />
             </Grid>
+
+            {/* Campo de URL da Imagem */}
+            <Grid item xs={12}>
+              <Controller
+                name="imagemUrl"
+                control={control}
+                rules={{
+                  pattern: {
+                    value: /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i,
+                    message: 'URL deve ser uma imagem válida (jpg, jpeg, png, gif, webp)'
+                  }
+                }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="URL da Imagem"
+                    fullWidth
+                    placeholder="https://exemplo.com/imagem.jpg"
+                    helperText={errors.imagemUrl?.message || "Link da imagem do produto (opcional)"}
+                    error={!!errors.imagemUrl}
+                  />
+                )}
+              />
+            </Grid>
+
+            {/* Preview da Imagem */}
+            {watch('imagemUrl') && (
+              <Grid item xs={12}>
+                <Box sx={{ mt: 2, textAlign: 'center' }}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    Preview da Imagem:
+                  </Typography>
+                  <Box
+                    component="img"
+                    src={watch('imagemUrl')}
+                    alt="Preview do produto"
+                    sx={{
+                      maxWidth: '200px',
+                      maxHeight: '200px',
+                      borderRadius: 2,
+                      border: '1px solid #ddd',
+                      objectFit: 'cover'
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                </Box>
+              </Grid>
+            )}
 
             {/* Controles de Status */}
             <Grid item xs={12} sm={6}>

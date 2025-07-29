@@ -3,19 +3,23 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { InventoryProvider } from './contexts/InventoryContext';
-import { StoreProvider } from './contexts/StoreContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import AdminHeader from './components/admin/AdminHeader';
-import StoreHeader from './components/store/StoreHeader';
-import ShoppingCart from './components/store/ShoppingCart';
-import Login from './components/Login';
-import Dashboard from './pages/Dashboard';
-import Inventory from './pages/Inventory';
-import Reports from './pages/Reports';
-import StorePage from './pages/store/StorePage';
-import LandingPage from './pages/LandingPage';
+import { AuthProvider, useAuth } from './contexts';
+import { InventoryProvider } from './contexts';
+import { StoreProvider } from './contexts';
+import { 
+  ProtectedRoute, 
+  Login, 
+  AdminHeader, 
+  StoreHeader, 
+  ShoppingCart 
+} from './components';
+import { 
+  Dashboard, 
+  Inventory, 
+  Reports, 
+  StorePage, 
+  LandingPage 
+} from './pages';
 import './App.css';
 
 // Tema personalizado do Material-UI
@@ -77,7 +81,11 @@ const AppRoutes = () => {
       />
       
       {/* Landing Page */}
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={
+        <StoreProvider>
+          <LandingPage />
+        </StoreProvider>
+      } />
       
       {/* Rotas da Loja (Públicas - podem ser acessadas sem login) */}
       <Route path="/store" element={
@@ -89,30 +97,35 @@ const AppRoutes = () => {
       } />
       
       {/* Rotas Administrativas (Protegidas) */}
-      <Route path="/admin/*" element={
+      <Route path="/admin/dashboard" element={
         <ProtectedRoute>
           <InventoryProvider>
-            <Routes>
-              <Route path="dashboard" element={
-                <AdminLayout>
-                  <Dashboard />
-                </AdminLayout>
-              } />
-              <Route path="inventory" element={
-                <AdminLayout>
-                  <Inventory />
-                </AdminLayout>
-              } />
-              <Route path="reports" element={
-                <AdminLayout>
-                  <Reports />
-                </AdminLayout>
-              } />
-              <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
-            </Routes>
+            <AdminLayout>
+              <Dashboard />
+            </AdminLayout>
           </InventoryProvider>
         </ProtectedRoute>
       } />
+      <Route path="/admin/inventory" element={
+        <ProtectedRoute>
+          <InventoryProvider>
+            <AdminLayout>
+              <Inventory />
+            </AdminLayout>
+          </InventoryProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/reports" element={
+        <ProtectedRoute>
+          <InventoryProvider>
+            <AdminLayout>
+              <Reports />
+            </AdminLayout>
+          </InventoryProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+      <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
       
       {/* Redirecionamentos */}
       <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />

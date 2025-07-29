@@ -9,30 +9,35 @@ import {
   Box,
   Button,
   Menu,
-  MenuItem
+  MenuItem,
+  Avatar,
+  Divider
 } from '@mui/material';
 import {
   ShoppingCart as CartIcon,
   Store as StoreIcon,
   Menu as MenuIcon,
-  AdminPanelSettings as AdminIcon
+  AdminPanelSettings as AdminIcon,
+  Home as HomeIcon,
+  ExitToApp as LogoutIcon,
+  Person as PersonIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { useStore } from '../../contexts/StoreContext';
+import { useAuth } from '../../contexts';
+import { useStore } from '../../contexts';
 
 const StoreHeader = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { setCartOpen, getCartItemsCount } = useStore();
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState(null);
 
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
+  const handleMobileMenuOpen = (event) => {
+    setMobileMenuAnchor(event.currentTarget);
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
+  const handleMobileMenuClose = () => {
+    setMobileMenuAnchor(null);
   };
 
   const handleCartOpen = () => {
@@ -41,28 +46,49 @@ const StoreHeader = () => {
 
   const handleAdminAccess = () => {
     navigate('/admin/dashboard');
-    handleMenuClose();
+    handleMobileMenuClose();
   };
 
   const handleLogout = async () => {
     try {
-      await logout();
+      // Primeiro navegar para a página inicial
       navigate('/');
+      // Depois fazer logout
+      await logout();
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
     }
-    handleMenuClose();
+    handleMobileMenuClose();
   };
 
   return (
     <AppBar position="static" sx={{ background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)' }}>
       <Toolbar>
+        {/* Menu único para mobile */}
+        <IconButton
+          color="inherit"
+          onClick={handleMobileMenuOpen}
+          sx={{ display: { xs: 'block', sm: 'none' }, mr: 1 }}
+        >
+          <MenuIcon />
+        </IconButton>
+
         <StoreIcon sx={{ mr: 2 }} />
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Loja de Suplementos
         </Typography>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          {/* Botão para voltar à home */}
+          <IconButton
+            color="inherit"
+            onClick={() => navigate('/')}
+            title="Voltar à página inicial"
+            sx={{ display: { xs: 'none', sm: 'block' } }}
+          >
+            <HomeIcon />
+          </IconButton>
+
           {/* Botões de navegação da loja */}
           <Button 
             color="inherit" 
@@ -91,48 +117,108 @@ const StoreHeader = () => {
             </Badge>
           </IconButton>
 
-          {/* Menu do usuário */}
-          {user && (
-            <>
-              <IconButton
-                color="inherit"
-                onClick={handleMenuOpen}
+          {/* Avatar do usuário para desktop */}
+          {user ? (
+            <IconButton
+              color="inherit"
+              onClick={handleMobileMenuOpen}
+              sx={{ display: { xs: 'none', sm: 'block' } }}
+            >
+              <Avatar
+                src={user?.photoURL}
+                alt={user?.displayName}
+                sx={{ width: 32, height: 32 }}
               >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-              >
-                <MenuItem disabled>
-                  <Typography variant="body2">
-                    {user.displayName || user.email}
-                  </Typography>
-                </MenuItem>
-                <MenuItem onClick={handleAdminAccess}>
-                  <AdminIcon sx={{ mr: 1 }} />
-                  Área Administrativa
-                </MenuItem>
-                <MenuItem onClick={handleLogout}>
-                  Logout
-                </MenuItem>
-              </Menu>
-            </>
-          )}
-
-          {/* Botão de login se não estiver logado */}
-          {!user && (
+                {user?.displayName?.charAt(0)}
+              </Avatar>
+            </IconButton>
+          ) : (
             <Button 
               color="inherit" 
               onClick={() => navigate('/login')}
               variant="outlined"
-              sx={{ borderColor: 'white', color: 'white' }}
+              sx={{ 
+                borderColor: 'white', 
+                color: 'white',
+                display: { xs: 'none', sm: 'block' }
+              }}
             >
               Login
             </Button>
           )}
         </Box>
+
+        {/* Menu unificado (mobile e desktop) */}
+        <Menu
+          anchorEl={mobileMenuAnchor}
+          open={Boolean(mobileMenuAnchor)}
+          onClose={handleMobileMenuClose}
+        >
+          {/* Informações do usuário se logado */}
+          {user && (
+            <>
+              <MenuItem disabled>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Avatar
+                    src={user?.photoURL}
+                    alt={user?.displayName}
+                    sx={{ width: 24, height: 24 }}
+                  >
+                    {user?.displayName?.charAt(0)}
+                  </Avatar>
+                  <Box>
+                    <Typography variant="body2" fontWeight="bold">
+                      {user?.displayName || 'Usuário'}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                      {user?.email}
+                    </Typography>
+                  </Box>
+                </Box>
+              </MenuItem>
+              <Divider />
+            </>
+          )}
+
+          {/* Opções de navegação */}
+          <MenuItem onClick={() => { navigate('/'); handleMobileMenuClose(); }}>
+            <HomeIcon sx={{ mr: 1 }} />
+            Página Inicial
+          </MenuItem>
+          <MenuItem onClick={() => { navigate('/store'); handleMobileMenuClose(); }}>
+            <StoreIcon sx={{ mr: 1 }} />
+            Produtos
+          </MenuItem>
+          <MenuItem onClick={() => { setCartOpen(true); handleMobileMenuClose(); }}>
+            <Badge badgeContent={getCartItemsCount()} color="error">
+              <CartIcon sx={{ mr: 1 }} />
+            </Badge>
+            Carrinho
+          </MenuItem>
+
+          {/* Opções específicas para usuários logados */}
+          {user ? (
+            <>
+              <Divider />
+              <MenuItem onClick={() => { handleAdminAccess(); handleMobileMenuClose(); }}>
+                <AdminIcon sx={{ mr: 1 }} />
+                Área Administrativa
+              </MenuItem>
+              <MenuItem onClick={() => { handleLogout(); handleMobileMenuClose(); }}>
+                <LogoutIcon sx={{ mr: 1 }} />
+                Logout
+              </MenuItem>
+            </>
+          ) : (
+            <>
+              <Divider />
+              <MenuItem onClick={() => { navigate('/login'); handleMobileMenuClose(); }}>
+                <PersonIcon sx={{ mr: 1 }} />
+                Login
+              </MenuItem>
+            </>
+          )}
+        </Menu>
       </Toolbar>
     </AppBar>
   );
