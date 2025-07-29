@@ -10,7 +10,7 @@ import {
   CircularProgress
 } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts';
 
 const Login = () => {
   const { signInWithGoogle, loading, error } = useAuth();

@@ -24,7 +24,7 @@ import {
   ShoppingCart as CartIcon,
   Search as SearchIcon
 } from '@mui/icons-material';
-import { useStore } from '../../contexts/StoreContext';
+import { useStore } from '../../contexts';
 import { getUserInfo } from '../../services/userService';
 
 const StorePage = () => {
@@ -107,30 +107,64 @@ const StorePage = () => {
     return (
       <Card 
         sx={{ 
-          height: '100%',
+          height: 480, // Altura fixa para uniformidade
           display: 'flex',
           flexDirection: 'column',
-          transition: 'transform 0.2s',
+          transition: 'transform 0.2s, box-shadow 0.2s',
+          maxWidth: 350, // Largura máxima
+          mx: 'auto', // Centralizar o card
           '&:hover': {
             transform: 'translateY(-4px)',
-            boxShadow: 3
+            boxShadow: 4
           }
         }}
       >
         <CardMedia
           component="div"
           sx={{
-            height: 200,
-            background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+            height: 180, // Altura fixa da imagem
+            background: product.imagemUrl 
+              ? 'transparent' 
+              : 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            position: 'relative'
+            position: 'relative',
+            overflow: 'hidden'
           }}
         >
-          <Typography variant="h4" color="white" sx={{ textAlign: 'center', p: 2 }}>
-            {product.nome.charAt(0).toUpperCase()}
-          </Typography>
+          {product.imagemUrl ? (
+            <Box
+              component="img"
+              src={product.imagemUrl}
+              alt={product.nome}
+              sx={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+          ) : null}
+          
+          {/* Fallback quando não há imagem ou erro ao carregar */}
+          <Box
+            sx={{
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+              display: product.imagemUrl ? 'none' : 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Typography variant="h4" color="white" sx={{ textAlign: 'center', p: 2 }}>
+              {product.nome.charAt(0).toUpperCase()}
+            </Typography>
+          </Box>
           
           {/* Badge de categoria */}
           <Chip
@@ -159,61 +193,145 @@ const StorePage = () => {
           )}
         </CardMedia>
 
-        <CardContent sx={{ flexGrow: 1 }}>
-          <Typography gutterBottom variant="h6" component="h2" noWrap>
+        <CardContent sx={{ 
+          flexGrow: 1, 
+          display: 'flex',
+          flexDirection: 'column',
+          p: 2,
+          pb: 1,
+          minHeight: 240 // Altura mínima para o conteúdo
+        }}>
+          <Typography 
+            gutterBottom 
+            variant="h6" 
+            component="h2" 
+            sx={{ 
+              fontSize: '1rem',
+              fontWeight: 600,
+              lineHeight: 1.2,
+              height: '2.4em', // Altura fixa para 2 linhas
+              overflow: 'hidden',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              mb: 1
+            }}
+          >
             {product.nome}
           </Typography>
           
-          <Typography variant="body2" color="text.secondary" gutterBottom>
+          <Typography 
+            variant="body2" 
+            color="text.secondary" 
+            gutterBottom
+            sx={{ mb: 1, fontSize: '0.875rem' }}
+          >
             {product.marca}
           </Typography>
 
           {/* Informações do Fornecedor */}
           {supplierInfo && (
             <Box sx={{ mb: 1, p: 1, backgroundColor: '#f8f9fa', borderRadius: 1 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                📍 Fornecedor: {supplierInfo.displayName || 'Fornecedor'}
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.75rem' }}>
+                📍 {supplierInfo.displayName || 'Fornecedor'}
               </Typography>
               {product.fornecedor && (
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.75rem' }}>
                   🏢 {product.fornecedor}
                 </Typography>
               )}
             </Box>
           )}
           
-          <Typography variant="body2" paragraph sx={{ height: 40, overflow: 'hidden' }}>
-            {product.descricao || 'Produto de qualidade para sua suplementação.'}
-          </Typography>
-          
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="h6" color="primary.main" sx={{ fontWeight: 'bold' }}>
-              {formatPrice(product.precoVenda)}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              por {product.unidade}
+          <Box
+            sx={{
+              height: '3em', // Altura fixa para a área de descrição
+              mb: 2,
+              flexGrow: 1,
+              overflow: 'hidden',
+              '&:hover': {
+                overflow: 'visible'
+              }
+            }}
+          >
+            <Typography 
+              variant="body2" 
+              paragraph 
+              sx={{ 
+                fontSize: '0.875rem',
+                lineHeight: 1.5,
+                maxHeight: '3em',
+                overflow: 'auto',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  maxHeight: '6em', // Expande para mostrar mais texto no hover
+                  backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                  borderRadius: 1,
+                  p: 1,
+                  zIndex: 10,
+                  position: 'relative',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: '#1976d2 #f1f1f1',
+                  '&::-webkit-scrollbar': {
+                    width: '4px'
+                  },
+                  '&::-webkit-scrollbar-track': {
+                    background: '#f1f1f1',
+                    borderRadius: '2px'
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    background: '#1976d2',
+                    borderRadius: '2px'
+                  },
+                  '&::-webkit-scrollbar-thumb:hover': {
+                    background: '#1565c0'
+                  }
+                }
+              }}
+              title={product.descricao || 'Produto de qualidade para sua suplementação.'}
+            >
+              {product.descricao || 'Produto de qualidade para sua suplementação.'}
             </Typography>
           </Box>
           
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Chip
-              label={stockStatus.label}
-              color={stockStatus.color}
-              size="small"
-            />
-            <Typography variant="body2" color="text.secondary">
-              {product.quantidade} {product.unidade} disponível
-            </Typography>
+          <Box sx={{ mt: 'auto' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="h6" color="primary.main" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
+                {formatPrice(product.precoVenda)}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                por {product.unidade}
+              </Typography>
+            </Box>
+            
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Chip
+                label={stockStatus.label}
+                color={stockStatus.color}
+                size="small"
+                sx={{ fontSize: '0.75rem' }}
+              />
+              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                {product.quantidade} {product.unidade}
+              </Typography>
+            </Box>
           </Box>
         </CardContent>
 
-        <CardActions sx={{ p: 2, pt: 0 }}>
+        <CardActions sx={{ p: 2, pt: 0, height: 60, alignItems: 'center' }}>
           <Button
             variant="contained"
             fullWidth
             startIcon={<CartIcon />}
             onClick={() => handleAddToCart(product)}
             disabled={product.quantidade === 0}
+            sx={{ 
+              height: 40,
+              fontSize: '0.875rem',
+              fontWeight: 600
+            }}
           >
             {product.quantidade === 0 ? 'Sem Estoque' : 'Adicionar ao Carrinho'}
           </Button>
@@ -233,7 +351,7 @@ const StorePage = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="xl" sx={{ py: 4, px: { xs: 2, sm: 3 } }}>
       {/* Cabeçalho da loja */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h3" component="h1" gutterBottom align="center">
@@ -298,9 +416,19 @@ const StorePage = () => {
           </Typography>
         </Box>
       ) : (
-        <Grid container spacing={3}>
+        <Grid 
+          container 
+          spacing={3} 
+          sx={{ 
+            justifyContent: { xs: 'center', sm: 'flex-start' },
+            '& .MuiGrid-item': {
+              display: 'flex',
+              justifyContent: 'center'
+            }
+          }}
+        >
           {filteredProducts.map((product) => (
-            <Grid item key={product.id} xs={12} sm={6} md={4} lg={3}>
+            <Grid item key={product.id} xs={12} sm={6} md={4} xl={3}>
               <ProductCard product={product} />
             </Grid>
           ))}

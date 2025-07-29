@@ -1,4 +1,4 @@
-// ShoppingCart.js
+//ShoppingCart.js
 import React, { useState } from 'react';
 import {
   Drawer,
@@ -24,10 +24,11 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon,
   ShoppingCart as CartIcon,
-  Email as EmailIcon
+  Email as EmailIcon,
+  ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
-import { useStore } from '../../contexts/StoreContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { useStore } from '../../contexts';
+import { useAuth } from '../../contexts';
 import { getUserInfo } from '../../services/userService';
 
 const ShoppingCart = () => {
@@ -72,7 +73,7 @@ const ShoppingCart = () => {
     }));
   };
 
-  const generateOrderEmail = async () => {
+  const handleSendOrder = async () => {
     const orderData = {
       cliente: customerInfo,
       itens: cart,
@@ -80,17 +81,6 @@ const ShoppingCart = () => {
       data: new Date().toLocaleString('pt-BR')
     };
 
-    let emailBody = `NOVO PEDIDO - Marketplace de Suplementos\n\n`;
-    emailBody += `Data: ${orderData.data}\n\n`;
-    emailBody += `=== DADOS DO CLIENTE ===\n`;
-    emailBody += `Nome: ${orderData.cliente.nome}\n`;
-    emailBody += `Email: ${orderData.cliente.email}\n`;
-    emailBody += `Telefone: ${orderData.cliente.telefone}\n`;
-    if (orderData.cliente.observacoes) {
-      emailBody += `Observações: ${orderData.cliente.observacoes}\n`;
-    }
-    emailBody += `\n=== ITENS DO PEDIDO ===\n`;
-    
     // Agrupar itens por fornecedor
     const itemsBySupplier = {};
     
@@ -107,15 +97,33 @@ const ShoppingCart = () => {
       
       itemsBySupplier[supplierKey].items.push(item);
     }
-    
-    let itemIndex = 1;
-    Object.values(itemsBySupplier).forEach((supplierGroup) => {
-      emailBody += `\n--- FORNECEDOR: ${supplierGroup.supplier.displayName || 'Fornecedor'} ---\n`;
-      if (supplierGroup.supplier.email) {
-        emailBody += `Email: ${supplierGroup.supplier.email}\n`;
-      }
-      emailBody += `\n`;
+
+    // Enviar email individual para cada fornecedor
+    for (const [, supplierGroup] of Object.entries(itemsBySupplier)) {
+      const supplierEmail = supplierGroup.supplier?.email;
       
+      if (!supplierEmail) {
+        console.warn(`Email não encontrado para fornecedor: ${supplierGroup.supplier?.displayName || 'Desconhecido'}`);
+        continue;
+      }
+
+      // Calcular total dos itens deste fornecedor
+      const supplierTotal = supplierGroup.items.reduce((total, item) => {
+        return total + (item.precoVenda * item.quantidadeCarrinho);
+      }, 0);
+
+      let emailBody = `NOVO PEDIDO - Marketplace de Suplementos\n\n`;
+      emailBody += `Data: ${orderData.data}\n\n`;
+      emailBody += `=== DADOS DO CLIENTE ===\n`;
+      emailBody += `Nome: ${orderData.cliente.nome}\n`;
+      emailBody += `Email: ${orderData.cliente.email}\n`;
+      emailBody += `Telefone: ${orderData.cliente.telefone}\n`;
+      if (orderData.cliente.observacoes) {
+        emailBody += `Observações: ${orderData.cliente.observacoes}\n`;
+      }
+      emailBody += `\n=== SEUS PRODUTOS NO PEDIDO ===\n`;
+      
+      let itemIndex = 1;
       supplierGroup.items.forEach((item) => {
         emailBody += `${itemIndex}. ${item.nome}\n`;
         emailBody += `   Marca: ${item.marca}\n`;
@@ -125,26 +133,23 @@ const ShoppingCart = () => {
         emailBody += `   Subtotal: R$ ${(item.precoVenda * item.quantidadeCarrinho).toFixed(2)}\n\n`;
         itemIndex++;
       });
-    });
-    
-    emailBody += `=== RESUMO ===\n`;
-    emailBody += `Total de itens: ${getCartItemsCount()}\n`;
-    emailBody += `VALOR TOTAL: R$ ${orderData.total.toFixed(2)}\n\n`;
-    emailBody += `Pedido gerado automaticamente pelo Marketplace de Suplementos.`;
+      
+      emailBody += `=== RESUMO DESTE FORNECEDOR ===\n`;
+      emailBody += `Total de itens: ${supplierGroup.items.reduce((count, item) => count + item.quantidadeCarrinho, 0)}\n`;
+      emailBody += `VALOR TOTAL SEUS PRODUTOS: R$ ${supplierTotal.toFixed(2)}\n\n`;
+      emailBody += `Entre em contato com o cliente para confirmar o pedido e combinar a entrega.\n\n`;
+      emailBody += `Pedido gerado automaticamente pelo Marketplace de Suplementos.`;
 
-    return emailBody;
-  };
+      const subject = `Novo Pedido - ${customerInfo.nome} - R$ ${supplierTotal.toFixed(2)}`;
+      const mailtoLink = `mailto:${supplierEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+      
+      // Abrir cliente de email para este fornecedor
+      window.open(mailtoLink);
+      
+      // Pequeno delay entre os emails para evitar conflitos
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
 
-  const handleSendOrder = async () => {
-    const emailBody = await generateOrderEmail();
-    const subject = `Novo Pedido Marketplace - ${customerInfo.nome} - R$ ${getCartTotal().toFixed(2)}`;
-    
-    // Criar link mailto para envio do email
-    const mailtoLink = `mailto:marketplace@suplementos.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
-    
-    // Abrir cliente de email
-    window.open(mailtoLink);
-    
     // Limpar carrinho e fechar diálogos
     clearCart();
     setOrderDialogOpen(false);
@@ -183,6 +188,13 @@ const ShoppingCart = () => {
       >
         <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <IconButton 
+              onClick={() => setCartOpen(false)}
+              sx={{ mr: 1 }}
+              size="small"
+            >
+              <ArrowBackIcon />
+            </IconButton>
             <CartIcon sx={{ mr: 1 }} />
             <Typography variant="h6">
               Carrinho ({getCartItemsCount()})
