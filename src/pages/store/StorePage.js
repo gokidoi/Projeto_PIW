@@ -26,6 +26,7 @@ import {
 } from '@mui/icons-material';
 import { useStore } from '../../contexts';
 import { getUserInfo } from '../../services/userService';
+import LogoHeader from '../../assets/logo_PRETA.png';
 
 const StorePage = () => {
   const {
@@ -354,9 +355,17 @@ const StorePage = () => {
     <Container maxWidth="xl" sx={{ py: 4, px: { xs: 2, sm: 3 } }}>
       {/* Cabeçalho da loja */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h3" component="h1" gutterBottom align="center">
-          Loja de Suplementos
-        </Typography>
+         <Box
+          component="img"
+          src={LogoHeader}
+          alt="Loja de Suplementos"
+          sx={{
+            height: '80px',
+            display: 'block',
+            margin: '0 auto',
+            mb: 2
+          }}
+        />
         <Typography variant="h6" color="text.secondary" align="center">
           Os melhores suplementos para seus objetivos
         </Typography>

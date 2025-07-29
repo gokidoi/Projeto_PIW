@@ -26,6 +26,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts';
 import { useStore } from '../contexts';
+import Logo from '../assets/logo_BRANCA.png';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -125,18 +126,16 @@ const LandingPage = () => {
               textAlign: 'center'
             }}
           >
-            <Typography 
-              variant="h2" 
-              component="h1" 
-              gutterBottom 
-              fontWeight="bold"
-              sx={{
-                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
-                mb: 2
+            {/* Logo */}
+            <img 
+              src={Logo} 
+              alt="Logo Marca" 
+              style={{
+                height: '80px',
+                marginRight: '20px',
+                objectFit: 'contain'
               }}
-            >
-              Excelência Fitness
-            </Typography>
+            />
             <Typography 
               variant="h5" 
               paragraph 

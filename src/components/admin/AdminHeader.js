@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts';
+import Logo from '../../assets/logo_BRANCA.png';
 
 const AdminHeader = () => {
   const navigate = useNavigate();
@@ -77,9 +78,17 @@ const AdminHeader = () => {
           <MenuIcon />
         </IconButton>
 
-        <Typography variant="h6" component="div" sx={{ mr: 4 }}>
-          🔧 Administramento
-        </Typography>
+        {/* Logo */}
+
+        <img 
+          src={Logo} 
+          alt="Logo Marca" 
+          style={{
+            height: '40px',
+            marginRight: '20px',
+            objectFit: 'contain'
+          }}
+        />
 
         {/* Menu desktop */}
         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>

@@ -25,6 +25,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts';
 import { useStore } from '../../contexts';
+import Logo from '../../assets/logo_BRANCA.png';
 
 const StoreHeader = () => {
   const navigate = useNavigate();
@@ -73,12 +74,18 @@ const StoreHeader = () => {
           <MenuIcon />
         </IconButton>
 
-        <StoreIcon sx={{ mr: 2 }} />
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Loja de Suplementos
-        </Typography>
+       {/* Logo */}
+        <img 
+          src={Logo} 
+          alt="Logo Marca" 
+          style={{
+            height: '40px',
+            marginRight: '20px',
+            objectFit: 'contain'
+          }}
+        />
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1, justifyContent: 'flex-end' }}>
           {/* Botão para voltar à home */}
           <IconButton
             color="inherit"
